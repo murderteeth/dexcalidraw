@@ -20,6 +20,10 @@ export default NextAuth({
       },
         async authorize(credentials) {
         try {
+          if(credentials === undefined) {
+            throw 'Credentials not set'
+          }
+
           // "message" and "signature" are needed for authorisation
           // we described them in "credentials" above
           const { message, signature } = credentials
@@ -46,7 +50,7 @@ export default NextAuth({
       user && (token.user = user)
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token } : { session: any, token: any }) {
       session.user = token.user
       return session
     },

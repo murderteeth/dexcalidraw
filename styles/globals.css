@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: Virgil;
+  src: url('/Virgil.woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
 html, body, #__next {
   @apply w-full h-full;
 }
