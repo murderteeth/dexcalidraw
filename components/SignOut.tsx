@@ -1,8 +1,9 @@
-import { signOut } from 'next-auth/react'
+import { useMoralis } from 'react-moralis'
 import { Button } from './controls'
 
 export default function SignOut({ className }: { className?: string }) {
-  return <Button onClick={() => signOut({ callbackUrl: '/' })} className={className}>
+  const { logout } = useMoralis()
+  return <Button onClick={logout} className={className}>
     Sign out
   </Button>
 }
