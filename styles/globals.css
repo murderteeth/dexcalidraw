@@ -15,5 +15,5 @@ html, body, #__next {
 
 body {
   @apply bg-zinc-900 text-pink-200
-  bg-gradient-to-b from-purple-900 via-purple-900 to-zinc-900;
+  bg-fixed bg-gradient-to-b from-purple-900 via-purple-900 to-zinc-900;
 }
