@@ -9,6 +9,6 @@ export default function Drawings() {
     sm:grid-cols-2 sm:gap-8
     lg:grid-cols-3
     2xl:grid-cols-6`}>
-    {drawings.map(drawing => <Tile key={drawing} drawingId={drawing} />)}
+    {drawings.map(drawing => <Tile key={drawing.id} drawing={drawing} />)}
   </div>
 }

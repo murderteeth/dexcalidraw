@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useMoralis, useMoralisCloudFunction, useMoralisFile, useMoralisQuery, useNewMoralisObject } from 'react-moralis'
 import useScrollOverpass from '../hooks/useScrollOverpass'
 import { Button } from './controls'
@@ -7,8 +7,8 @@ import ProfileButton from './ProfileButton'
 import Drawings from './Drawings'
 import { useDrawings } from '../hooks/useDrawings'
 import { useSelection } from '../hooks/useSelection'
-import { GrClose } from 'react-icons/gr'
 import { AiOutlineClose, AiOutlineDelete } from 'react-icons/ai'
+import Busy from './Busy'
 // import Moralis from 'moralis/types'
 
 function HeaderButton({ onClick, icon } : { onClick: () => void, icon?: any }) {
@@ -44,7 +44,7 @@ export default function Dashboard() {
   //   console.log('account', account, chainId, user)
   // }, [account, user])
 
-  async function onSaveDrawing() {
+  const onSaveDrawing = useCallback(async () => {
     const data = {
       base64: Buffer.from(JSON.stringify({ hello: 'world' })).toString('base64')
     }
@@ -55,13 +55,15 @@ export default function Dashboard() {
       owner: user,
       name, file
     })
-  }
+  }, [drawings, saveFile, saveDrawing])
 
-  async function deleteSelected() {
-
-  }
+  const onDeleteSelection = useCallback(async () => {
+    for(let drawing of selection) await drawing.destroy()
+    toggleSelectionMode()
+  }, [selection, toggleSelectionMode])
 
   return <div className="relative w-full flex flex-col">
+    <Busy />
     {/* HACK: inject these overpass utlity classes */}
     <div className="bg-purple-900/60 backdrop-blur-md shadow-md hidden">x</div>
     <div className={`
@@ -84,7 +86,7 @@ export default function Dashboard() {
           <div className={'font-bold text-xl'}>{selection.length}</div>
         </div>
 
-        <HeaderButton onClick={deleteSelected} icon={AiOutlineDelete} />
+        <HeaderButton onClick={onDeleteSelection} icon={AiOutlineDelete} />
       </div>}
 
     </div>

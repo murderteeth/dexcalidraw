@@ -9,7 +9,7 @@ export default function ProfileButton() {
     <div className={'w-[48px] h-[48px]'}></div>
     <div className={`
       absolute z-[10] top-0 p-[4px] flex items-center justify-center 
-      bg-purple-800 group-hover:bg-amber-400
+      bg-purple-500 group-hover:bg-slate-900
       shadow-md rounded-full`}>
       <Jazzicon diameter={40} seed={jsNumberForAddress(account || '')} />
     </div>
@@ -24,14 +24,14 @@ export default function ProfileButton() {
           className={`
           w-full px-16 py-4 h-fit 
           border-b border-b-black/20
-          text-slate-900 hover:text-amber-800 bg-amber-400
+          text-purple-500 hover:text-slate-100 bg-slate-900
           shadow-md rounded-t-lg
           whitespace-nowrap`}>
           {truncateAddress(account)}
         </button>
         <button onClick={logout} className={`
           w-full px-16 py-4
-          text-slate-900 hover:text-amber-800 bg-amber-400
+          text-purple-500 hover:text-slate-100 bg-slate-900
           shadow-md rounded-b-lg
           whitespace-nowrap`}>
           {'Sign out'}
