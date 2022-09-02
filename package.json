@@ -19,9 +19,12 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.4.0",
+    "react-jazzicon": "^1.0.4",
     "react-moralis": "1.4.0",
     "react-responsive": "^9.0.0-beta.10",
-    "tailwindcss": "^3.1.8"
+    "tailwindcss": "^3.1.8",
+    "tailwindcss-text-fill-stroke": "^2.0.0-beta.1",
+    "use-long-press": "^2.0.2"
   },
   "devDependencies": {
     "@types/node": "18.7.9",

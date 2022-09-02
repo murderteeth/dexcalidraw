@@ -1,31 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useMoralis, useMoralisCloudFunction, useMoralisFile, useMoralisQuery, useNewMoralisObject } from 'react-moralis'
 import useScrollOverpass from '../hooks/useScrollOverpass'
-import { truncateAddress } from '../utilities'
-import { A, Button } from './controls'
-import SignOut from './SignOut'
+import { Button } from './controls'
 import Wordmark from './Wordmark'
-import NFT from './controls/NFT'
+import ProfileButton from './ProfileButton'
+import Drawings from './Drawings'
+import { useDrawings } from '../hooks/useDrawings'
+import { useSelection } from '../hooks/useSelection'
+import { GrClose } from 'react-icons/gr'
+import { AiOutlineClose, AiOutlineDelete } from 'react-icons/ai'
 // import Moralis from 'moralis/types'
 
+function HeaderButton({ onClick, icon } : { onClick: () => void, icon?: any }) {
+  return <button onClick={onClick} className={`
+    p-2 text-2xl hover:bg-amber-400 hover:text-slate-900 
+    active:transform active:scale-95
+    transition duration-200 rounded-full`}>
+    {icon()}
+  </button>
+}
+
 export default function Dashboard() {
-  const { account, chainId, user } = useMoralis()
-  const { overpassClassName } = useScrollOverpass()
-  const [ drawings, setDrawings ] = useState<string[]>([])
+  const { user } = useMoralis()
   const {saveFile} = useMoralisFile()
   const { save: saveDrawing } = useNewMoralisObject('Drawing')
-  const { fetch: fetchDrawings } = useMoralisQuery(
-    'Drawing',
-    (query) => query.equalTo('owner', user),
-    [user], { autoFetch: false }
-  )
-
-  useEffect(() => {
-    (async () => {
-      const drawings = await fetchDrawings()
-      setDrawings((await fetchDrawings())?.map(d => d.id) || [])
-    })()
-  }, [fetchDrawings, setDrawings])
+  const { overpassClassName } = useScrollOverpass()
+  const {drawings} = useDrawings()
+  const {toggleSelectionMode, selectionMode, selection} = useSelection()
 
   const { fetch: fetchTest } = useMoralisCloudFunction(
     "test",
@@ -54,43 +55,39 @@ export default function Dashboard() {
       owner: user,
       name, file
     })
-    setDrawings(current => [drawing.id, ...current])
+  }
+
+  async function deleteSelected() {
+
   }
 
   return <div className="relative w-full flex flex-col">
+    {/* HACK: inject these overpass utlity classes */}
+    <div className="bg-purple-900/60 backdrop-blur-md shadow-md hidden">x</div>
     <div className={`
-      sticky top-0 z-10 bg-purple-900
-      px-8 py-4 flex items-center justify-between 
+      sticky top-0 z-10 h-20 px-8 flex items-center
       ${overpassClassName}`}>
 
-      {/* HACK: inject these overpass utlity classes */}
-      <div className="bg-purple-900/60 backdrop-blur-md shadow-md hidden">x</div>
+      {!selectionMode && <div className={'w-full grid grid-cols-3 '}>
+        <Wordmark className="w-fit text-3xl" />
+        <div className={'flex items-center justify-center'}>
+          <Button onClick={onSaveDrawing}>Save drawing</Button>
+        </div>
+        <div className="flex items-center justify-end gap-8">
+          <ProfileButton />
+        </div>
+      </div>}
 
-      <Wordmark className="text-3xl" />
-      <Button onClick={onSaveDrawing}>Save drawing</Button>
-      <div className="flex items-center justify-end gap-8">
-        <div>
-          <A href={`https://etherscan.io/address/${account}`} target="_blank" rel="noreferrer">
-            {truncateAddress(account)}
-          </A>
+      {selectionMode && <div className={'w-full flex items-center justify-between text-purple-300'}>
+        <div className={'flex items-center gap-6'}>
+          <HeaderButton onClick={toggleSelectionMode} icon={AiOutlineClose} />
+          <div className={'font-bold text-xl'}>{selection.length}</div>
         </div>
-        <div className="flex flex-col items-center">
-          <NFT className="text-5xl" />
-        </div>
-        <SignOut />
-      </div>
+
+        <HeaderButton onClick={deleteSelected} icon={AiOutlineDelete} />
+      </div>}
+
     </div>
-    <div className={`
-      p-8 grid grid-flow-row grid-cols-1 gap-0
-      sm:grid-cols-2 sm:gap-8
-      lg:grid-cols-3
-      2xl:grid-cols-6`}>
-      {drawings.map(drawing => <div key={drawing} className={`
-        aspect-video bg-purple-800 shadow rounded-lg
-        hover:bg-amber-400 hover:text-slate-900
-        active:transform active:scale-95
-        transition duration-200 cursor-pointer`}>
-      </div>)}
-    </div>
+    <Drawings />
   </div>
 }
