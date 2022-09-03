@@ -49,7 +49,7 @@ export default function Tile({drawing} : {drawing: Moralis.Object}) {
 
   return <div className={'relative'}>
     {selectionMode && <div className={`
-      absolute z-10 top-1 left-1 pointer-events-none`}>
+      absolute z-10 top-2 left-2 pointer-events-none`}>
       <Check checked={selected} />
     </div>}
     <div onClick={onClick} {...bindOnLongPress()} className={`
@@ -58,7 +58,7 @@ export default function Tile({drawing} : {drawing: Moralis.Object}) {
       hover:bg-slate-900 hover:text-slate-900
       ${selected ? 'scale-95' : 'scale-1'}
       active:transform active:scale-95
-      transition duration-200 cursor-pointer`}>
+      transition duration-200 shadow-lg cursor-pointer`}>
     </div>
   </div>
 }

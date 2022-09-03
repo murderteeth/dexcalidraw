@@ -8,7 +8,7 @@ import Drawings from './Drawings'
 import { useDrawings } from '../hooks/useDrawings'
 import { useSelection } from '../hooks/useSelection'
 import { AiOutlineClose, AiOutlineDelete } from 'react-icons/ai'
-import Busy from './Busy'
+import Busy, { useBusy } from './Busy'
 // import Moralis from 'moralis/types'
 
 function HeaderButton({ onClick, icon } : { onClick: () => void, icon?: any }) {
@@ -21,9 +21,10 @@ function HeaderButton({ onClick, icon } : { onClick: () => void, icon?: any }) {
 }
 
 export default function Dashboard() {
+  const { setBusy } = useBusy()
   const { user } = useMoralis()
   const {saveFile} = useMoralisFile()
-  const { save: saveDrawing } = useNewMoralisObject('Drawing')
+  const { save: saveDrawing, isSaving } = useNewMoralisObject('Drawing')
   const { overpassClassName } = useScrollOverpass()
   const {drawings} = useDrawings()
   const {toggleSelectionMode, selectionMode, selection} = useSelection()
@@ -44,7 +45,12 @@ export default function Dashboard() {
   //   console.log('account', account, chainId, user)
   // }, [account, user])
 
+  useEffect(() => {
+    setBusy(isSaving)
+  }, [isSaving, setBusy])
+
   const onSaveDrawing = useCallback(async () => {
+    setBusy(true)
     const data = {
       base64: Buffer.from(JSON.stringify({ hello: 'world' })).toString('base64')
     }
@@ -58,9 +64,11 @@ export default function Dashboard() {
   }, [drawings, saveFile, saveDrawing])
 
   const onDeleteSelection = useCallback(async () => {
+    setBusy(true)
     for(let drawing of selection) await drawing.destroy()
     toggleSelectionMode()
-  }, [selection, toggleSelectionMode])
+    setBusy(false)
+  }, [setBusy, selection, toggleSelectionMode])
 
   return <div className="relative w-full flex flex-col">
     <Busy />
