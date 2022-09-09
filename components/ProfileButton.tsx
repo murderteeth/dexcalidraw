@@ -1,41 +1,54 @@
 import { useMoralis } from 'react-moralis'
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import { truncateAddress } from '../utilities'
+import { useDialogRoute } from '../hooks/useDialogRoute'
+
+function Option({onClick, className, children} : {onClick?: () => void, className?: string, children: any}) {
+  return <div onClick={onClick}
+    className={`
+    w-full px-16 py-4 h-fit
+    bg-gray-100 hover:bg-gray-200
+    dark:text-purple-100
+    dark:bg-[#363636] dark:hover:bg-[#1f1f1f]
+    first:rounded-t-lg last:rounded-b-lg
+    whitespace-nowrap cursor-pointer shadow-md
+    ${className}`}>
+    {children}
+  </div>
+}
 
 export default function ProfileButton() {
-  const { account, chainId, logout } = useMoralis()
+  const { setDialogRoute } = useDialogRoute()
+  const { account, logout } = useMoralis()
 
   return <div className={'group relative h-full'}>
-    <div className={'w-[48px] h-[48px]'}></div>
+    <div className={'w-[32px] h-[32px] py-2'}></div>
     <div className={`
-      absolute z-[10] top-0 p-[4px] flex items-center justify-center 
-      bg-purple-500 group-hover:bg-slate-900
-      shadow-md rounded-full`}>
-      <Jazzicon diameter={40} seed={jsNumberForAddress(account || '')} />
+      absolute z-[10] top-0 flex items-center justify-center 
+      rounded-full`}>
+      <Jazzicon diameter={32} seed={jsNumberForAddress(account || '')} />
     </div>
     <div className={`
-      absolute inset-1 -right-2 hidden group-hover:block
-      pt-[68px] flex items-center justify-center
-      `}>
-      <div className={'absolute -right-2 w-fit h-fit'}>
-        <button onClick={() =>
+      absolute top-0 -right-[16px] pt-[48px] block
+      opacity-0 pointer-events-none
+      group-hover:opacity-100 group-hover:pointer-events-auto
+      flex items-center justify-center`}>
+      <div className={'w-fit h-fit'}>
+        <Option onClick={() => setDialogRoute('open')}>
+          {'Open'}
+        </Option>
+        <Option onClick={() => setDialogRoute('save')}>
+          {'Save'}
+        </Option>
+        <Option onClick={() =>
             window.open(`https://etherscan.io/address/${account}`, '_blank', 'noreferrer')
           }
-          className={`
-          w-full px-16 py-4 h-fit 
-          border-b border-b-black/20
-          text-purple-500 hover:text-slate-100 bg-slate-900
-          shadow-md rounded-t-lg
-          whitespace-nowrap`}>
+          className={'border-t border-t-gray-300 dark:border-t-[#1f1f1f]'}>
           {truncateAddress(account)}
-        </button>
-        <button onClick={logout} className={`
-          w-full px-16 py-4
-          text-purple-500 hover:text-slate-100 bg-slate-900
-          shadow-md rounded-b-lg
-          whitespace-nowrap`}>
+        </Option>
+        <Option onClick={logout} className={''}>
           {'Sign out'}
-        </button>
+        </Option>
       </div>
     </div>
   </div>

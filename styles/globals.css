@@ -12,8 +12,3 @@
 html, body, #__next {
   @apply w-full h-full;
 }
-
-body {
-  @apply bg-zinc-900 text-pink-200
-  bg-fixed bg-gradient-to-b from-purple-900  to-zinc-900;
-}
