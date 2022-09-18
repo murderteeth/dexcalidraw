@@ -21,7 +21,7 @@ export default function Open() {
     }
   }, [setBusy, selection, toggleSelectionMode])
 
-  return <div className="relative w-full flex flex-col">
+  return <div className={'relative w-full flex flex-col'}>
     <Busy />
 
     <div>

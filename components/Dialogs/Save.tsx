@@ -114,7 +114,7 @@ export default function Open() {
     user
   ])
 
-  return <div className="relative w-full flex flex-col">
+  return <div className={'relative w-full flex flex-col'}>
     <Busy />
 
     <div>

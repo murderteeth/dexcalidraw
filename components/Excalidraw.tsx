@@ -2,6 +2,7 @@ import { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types'
 import { AppState, BinaryFiles, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types'
 import React, { useCallback, useMemo } from 'react'
 import { useMoralis } from 'react-moralis'
+import { useDialogRoute } from '../hooks/useDialogRoute'
 import { useExcalidraw } from '../hooks/useExcalidraw'
 import ProfileButton from './ProfileButton'
 import SignIn from './SignIn'
@@ -9,11 +10,15 @@ import Wordmark from './Wordmark'
 
 function TopRightUi() {
   const { isAuthenticated } = useMoralis()
+  const { setDialogRoute } = useDialogRoute()
+
   return <div className={'Island'}>
     <div className={`
       px-4 py-2 flex items-center gap-4 shadow-md rounded-lg`}>
       {isAuthenticated && <>
-        <Wordmark />
+        <div onClick={() => setDialogRoute('about')} className={'cursor-pointer'}>
+          <Wordmark />
+        </div>
         <ProfileButton />
       </>}
       {!isAuthenticated && <>

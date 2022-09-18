@@ -22,14 +22,14 @@ export default function ProfileButton() {
   const { account, logout } = useMoralis()
 
   return <div className={'group relative h-full'}>
-    <div className={'w-[32px] h-[32px] py-2'}></div>
+    <div className={'w-[48px] h-[32px] py-2'}></div>
     <div className={`
-      absolute z-[10] top-0 flex items-center justify-center 
+      absolute z-[10] top-0 mx-[8px] flex items-center justify-center 
       rounded-full`}>
       <Jazzicon diameter={32} seed={jsNumberForAddress(account || '')} />
     </div>
     <div className={`
-      absolute top-0 -right-[16px] pt-[48px] block
+      absolute top-[32px] -right-[16px] pt-[16px] block
       opacity-0 pointer-events-none
       group-hover:opacity-100 group-hover:pointer-events-auto
       flex items-center justify-center`}>
