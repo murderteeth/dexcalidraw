@@ -1,8 +1,8 @@
 const getQuota = async user => {
   const FREE_PLAN = 3 // Drawings
-  const DRAGON_SLAYER_PLAN = 10_000 // Drawings
+  const PENDRAGON_PLAN = 10_000 // Drawings
   const hasNft = false
-  const max = hasNft ? DRAGON_SLAYER_PLAN : FREE_PLAN
+  const max = hasNft ? PENDRAGON_PLAN : FREE_PLAN
   const query = new Moralis.Query('Drawing')
   query.equalTo('owner', user)
   const results = await query.find({ useMasterKey: true })

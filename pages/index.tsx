@@ -1,10 +1,10 @@
 import DialogRouter from '../components/DialogRouter'
-import Excalidraw from '../components/Excalidraw'
+import Dexcalidraw from '../components/Dexcalidraw'
 import Theme from '../components/Theme'
 
 export default function Index() {
   return <Theme className={'relative w-full h-full flex items-center justify-center'}>
-    <Excalidraw />
+    <Dexcalidraw />
     <DialogRouter />
   </Theme>
 }

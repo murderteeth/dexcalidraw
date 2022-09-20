@@ -7,24 +7,26 @@ import { useExcalidraw } from '../hooks/useExcalidraw'
 import ProfileButton from './ProfileButton'
 import SignIn from './SignIn'
 import Wordmark from './Wordmark'
+import chains from '../chains.json'
 
 function TopRightUi() {
-  const { isAuthenticated } = useMoralis()
+  const { isAuthenticated, chainId } = useMoralis()
   const { setDialogRoute } = useDialogRoute()
+  const isChainSupported = useMemo(() => {
+    return Object.values(chains).some(chain => chain.id === parseInt(chainId || '0'))
+  }, [chainId])
 
   return <div className={'Island'}>
     <div className={`
       px-4 py-2 flex items-center gap-4 shadow-md rounded-lg`}>
-      {isAuthenticated && <>
-        <div onClick={() => setDialogRoute('about')} className={'cursor-pointer'}>
-          <Wordmark />
-        </div>
-        <ProfileButton />
-      </>}
-      {!isAuthenticated && <>
-        <Wordmark />
-        <SignIn />
-      </>}
+      <div onClick={() => setDialogRoute('about')} className={'cursor-pointer'}>
+        {isChainSupported && <Wordmark />}
+        {!isChainSupported && <div className={'px-4 py-2 text-xl text-red-400'}>
+          {`Network ${chainId} not supported!`}
+        </div>}
+      </div>
+      {isAuthenticated && isChainSupported && <ProfileButton />}
+      {!isAuthenticated && isChainSupported && <SignIn />}
     </div>
   </div>
 }
@@ -55,7 +57,7 @@ function ResetOverlay() {
   </button>
 }
 
-export default function Excalidraw() {
+export default function Dexcalidraw() {
   const {
     excalidrawModule,
     setExcalidrawApi,

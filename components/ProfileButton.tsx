@@ -41,7 +41,7 @@ export default function ProfileButton() {
           {'Save'}
         </Option>
         <Option onClick={() => setDialogRoute('subscription')}>
-          {'Subscription'}
+          {'Free Plan 0/3'}
         </Option>
         <Option onClick={() =>
             window.open(`https://etherscan.io/address/${account}`, '_blank', 'noreferrer')
