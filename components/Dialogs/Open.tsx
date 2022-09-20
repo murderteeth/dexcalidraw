@@ -49,7 +49,7 @@ export default function Open() {
       </div>}
     </div>
 
-    <div className={'overflow-scroll'}>
+    <div className={'overflow-auto'}>
       <Drawings />
     </div>
   </div>

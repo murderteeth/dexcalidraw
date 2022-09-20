@@ -37,7 +37,7 @@ export default function About() {
         </a>
       </div>
 
-      <div className={'mt-12 mb-4'}>{'Made with'}</div>
+      <div className={'mt-12 mb-4'}>{'Greatfully made with'}</div>
       <div className={'flex items-center justify-center gap-10'}>
         <a className={'flex items-center gap-3'} href={'https://github.com/excalidraw/excalidraw'} target={'_blank'} rel={'noreferrer'}>
           <img className={'h-12 dark:invert'} src={'https://raw.githubusercontent.com/excalidraw/excalidraw/master/dev-docs/static/img/logo.svg'} alt={'excalidraw'} />
