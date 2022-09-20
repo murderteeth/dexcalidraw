@@ -6,7 +6,7 @@ import { AiOutlineClose } from 'react-icons/ai'
 import Busy, { useBusy } from '../Busy'
 import { useDialogRoute } from '../../hooks/useDialogRoute'
 import DialogButton from './DialogButton'
-import { useExcalidraw } from '../../hooks/useExcalidraw'
+import { useDexcalidraw } from '../../hooks/useDexcalidraw'
 import { Button } from '../controls'
 import Input from '../controls/Input'
 
@@ -17,9 +17,9 @@ export default function Open() {
     elements, 
     appState, 
     files, 
-    dexcalidraw, 
-    setDexcalidraw 
-  } = useExcalidraw()
+    currentDrawing, 
+    setCurrentDrawing 
+  } = useDexcalidraw()
 
   const nameRef = useRef<HTMLInputElement>()
   const { busy, setBusy } = useBusy()
@@ -34,9 +34,9 @@ export default function Open() {
   const [shhh, setShhh] = useState(true)
 
   const defaultName = useMemo(() => {
-    if(dexcalidraw.id) return dexcalidraw.name
+    if(currentDrawing.id) return currentDrawing.name
     else return `Drawing #${drawings.length + 1}`
-  }, [drawings, dexcalidraw])
+  }, [drawings, currentDrawing])
 
   useEffect(() => {
     setTimeout(() => setShhh(false), 100)
@@ -83,7 +83,7 @@ export default function Open() {
       throw 'Save failed!'
     }
 
-    if(!dexcalidraw.id) {
+    if(!currentDrawing.id) {
       const drawing = await saveDrawing({
         owner: user,
         name, file
@@ -94,18 +94,18 @@ export default function Open() {
         throw 'Save failed!'
       }
 
-      setDexcalidraw({ id: drawing.id, name })
+      setCurrentDrawing({ id: drawing.id, name })
       excalidrawApi?.setToastMessage(`${name}.. saved`)
       // setBusy(false) <-- don't set false here.. let the isSaving effect hook handle it
 
     } else {
-      const drawing = drawings.find(drawing => drawing.id === dexcalidraw.id)
-      if(!drawing) throw `You call that a drawing? ${dexcalidraw.id}`
+      const drawing = drawings.find(drawing => drawing.id === currentDrawing.id)
+      if(!drawing) throw `You call that a drawing? ${currentDrawing.id}`
       drawing.set('name', name)
       drawing.set('file', file)
       await drawing.save()
 
-      setDexcalidraw({ id: dexcalidraw.id, name })
+      setCurrentDrawing({ ...currentDrawing, name })
       excalidrawApi?.setToastMessage(`${name}.. updated`)
       setBusy(false)
 
@@ -116,8 +116,8 @@ export default function Open() {
     saveDrawing, 
     elements, 
     drawings, 
-    dexcalidraw, 
-    setDexcalidraw,
+    currentDrawing, 
+    setCurrentDrawing,
     excalidrawApi,
     setBusy,
     user
@@ -155,7 +155,7 @@ export default function Open() {
       <div className={'w-1/2 flex items-center justify-center gap-2'}>
         <div className={'relative flex flex-col items-start'}>
           <Input _ref={nameRef} type={'text'} defaultValue={defaultName} disabled={busy} placeholder={'Name your drawing =)'}  />
-          <div className={'absolute -bottom-8 dark:text-purple-100/20'}>{dexcalidraw.id}</div>
+          <div className={'absolute -bottom-8 dark:text-purple-100/20'}>{currentDrawing.id}</div>
         </div>
         <Button onClick={onSaveDrawing} disabled={busy}>{'Save'}</Button>
       </div>

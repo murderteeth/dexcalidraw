@@ -11,12 +11,12 @@ export interface ExcalidrawModule {
   serializeAsJSON: typeof serializeAsJSON
 }
 
-export interface DexcalidrawState {
+export interface CurrentDrawing {
   id: string,
   name: string
 }
 
-interface ExcalidrawState {
+interface DexcalidrawState {
   excalidrawModule: ExcalidrawModule,
   excalidrawApi: ExcalidrawImperativeAPI|null,
   setExcalidrawApi: (api: ExcalidrawImperativeAPI) => void,
@@ -26,20 +26,20 @@ interface ExcalidrawState {
   setAppState: (appState: AppState) => void,
   files: BinaryFiles|null,
   setFiles: (files: BinaryFiles) => void,
-  dexcalidraw: { id: string, name: string }
-  setDexcalidraw: (state: DexcalidrawState) => void,
-  resetDexcalidraw: () => void
+  currentDrawing: { id: string, name: string }
+  setCurrentDrawing: (state: CurrentDrawing) => void,
+  resetCurrentDrawing: () => void
 }
 
-const	ExcalidrawContext = createContext({} as ExcalidrawState)
-export const useExcalidraw = () => useContext(ExcalidrawContext)
-export default function ExcalidrawProvider({ children } : { children: any }) {
+const	DexcalidrawContext = createContext({} as DexcalidrawState)
+export const useDexcalidraw = () => useContext(DexcalidrawContext)
+export default function DexcalidrawProvider({ children } : { children: any }) {
   const [module, setModule] = useState(null as any)
   const [api, setApi] = useState<ExcalidrawImperativeAPI|null>(null)
   const [elements, setElements] = useLocalStorage<readonly ExcalidrawElement[]>('elements', [])
   const [appState, setAppState] = useLocalStorage<AppState|null>('appState', null)
   const [files, setFiles] = useLocalStorage<BinaryFiles|null>('files', null)
-  const [dexcalidraw, setDexcalidraw] = useLocalStorage<DexcalidrawState>('dexcalidraw', { id: '', name: '' })
+  const [currentDrawing, setCurrentDrawing] = useLocalStorage<CurrentDrawing>('currentDrawing', { id: '', name: '' })
 
   useEffect(() => {
     import("@excalidraw/excalidraw").then((module) => {
@@ -47,14 +47,14 @@ export default function ExcalidrawProvider({ children } : { children: any }) {
     })
   }, [])
 
-	return <ExcalidrawContext.Provider value={{
+	return <DexcalidrawContext.Provider value={{
     excalidrawModule: module,
     excalidrawApi: api, setExcalidrawApi: setApi,
     elements, setElements,
     appState, setAppState,
     files, setFiles,
-    dexcalidraw, setDexcalidraw, 
-    resetDexcalidraw: () => setDexcalidraw({ id: '', name: '' }) }}>
+    currentDrawing: currentDrawing, setCurrentDrawing: setCurrentDrawing, 
+    resetCurrentDrawing: () => setCurrentDrawing({ id: '', name: '' }) }}>
     {children}
-  </ExcalidrawContext.Provider>
+  </DexcalidrawContext.Provider>
 }

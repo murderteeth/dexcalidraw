@@ -3,7 +3,7 @@ import { AppState, BinaryFiles, ExcalidrawImperativeAPI } from '@excalidraw/exca
 import React, { useCallback, useMemo } from 'react'
 import { useMoralis } from 'react-moralis'
 import { useDialogRoute } from '../hooks/useDialogRoute'
-import { useExcalidraw } from '../hooks/useExcalidraw'
+import { useDexcalidraw } from '../hooks/useDexcalidraw'
 import ProfileButton from './ProfileButton'
 import SignIn from './SignIn'
 import Wordmark from './Wordmark'
@@ -32,12 +32,12 @@ function TopRightUi() {
 }
 
 function ResetOverlay() {
-  const { excalidrawApi, resetDexcalidraw } = useExcalidraw()
+  const { excalidrawApi, resetCurrentDrawing } = useDexcalidraw()
 
   async function onClick() {
     if(confirm('sure about that?')) {
       await excalidrawApi?.resetScene()
-      resetDexcalidraw()
+      resetCurrentDrawing()
     }
   }
 
@@ -64,7 +64,7 @@ export default function Dexcalidraw() {
     elements, setElements, 
     appState, setAppState, 
     files, setFiles
-  } = useExcalidraw()
+  } = useDexcalidraw()
 
   const initialData = useMemo(() => {
     return {

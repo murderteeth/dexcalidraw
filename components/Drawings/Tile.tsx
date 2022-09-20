@@ -3,7 +3,7 @@ import { useLongPress } from 'use-long-press'
 import { useSelection } from '../../hooks/useSelection'
 import { AiOutlineCheck } from 'react-icons/ai'
 import Moralis from 'moralis/types'
-import { useExcalidraw } from '../../hooks/useExcalidraw'
+import { useDexcalidraw } from '../../hooks/useDexcalidraw'
 import { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types'
 import { BinaryFiles } from '@excalidraw/excalidraw/types/types'
 import { useDialogRoute } from '../../hooks/useDialogRoute'
@@ -22,8 +22,8 @@ export default function Tile({drawing} : {drawing: Moralis.Object}) {
     excalidrawApi, 
     appState, 
     setElements: setContextElements, 
-    setDexcalidraw 
-  } = useExcalidraw()
+    setCurrentDrawing 
+  } = useDexcalidraw()
 
   const { setDialogRoute } = useDialogRoute()
   const [longPressed, setLongPressed] = useState(false)
@@ -73,7 +73,7 @@ export default function Tile({drawing} : {drawing: Moralis.Object}) {
         }
       } else {
         (async () => {
-          setDexcalidraw({ id: drawing.id, name: await drawing.get('name')})
+          setCurrentDrawing({ id: drawing.id, name: await drawing.get('name')})
           setContextElements(elements)
           await excalidrawApi?.updateScene({ elements, appState })
           setDialogRoute('')
@@ -86,7 +86,7 @@ export default function Tile({drawing} : {drawing: Moralis.Object}) {
     select, 
     deselect, 
     elements, 
-    setDexcalidraw, 
+    setCurrentDrawing, 
     setContextElements, 
     excalidrawApi, 
     setDialogRoute,

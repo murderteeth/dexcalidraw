@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { MoralisProvider, useMoralis } from 'react-moralis'
 import { useEffect } from 'react'
-import ExcalidrawProvider from '../hooks/useExcalidraw'
+import DexcalidrawProvider from '../hooks/useDexcalidraw'
 import DialogRouteProvider from '../hooks/useDialogRoute'
 import { BusyProvider } from '../components/Busy'
 import DrawingsProvider from '../hooks/useDrawings'
@@ -24,7 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     appId="Nm7FBNDFK6fNSR8OpYMSOIaQmSLQOKuf7UNoDXul" 
     serverUrl="https://wgvzl4ch6vqj.usemoralis.com:2053/server">
     <DialogRouteProvider>
-      <ExcalidrawProvider>
+      <DexcalidrawProvider>
         <EnableWeb3>
           <BusyProvider>
             <DrawingsProvider>
@@ -42,7 +42,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             </DrawingsProvider>
           </BusyProvider>
         </EnableWeb3>
-      </ExcalidrawProvider>
+      </DexcalidrawProvider>
     </DialogRouteProvider>
   </MoralisProvider>
 }

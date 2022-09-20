@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
 import { useDialogRoute } from '../../hooks/useDialogRoute'
-import { useExcalidraw } from '../../hooks/useExcalidraw'
+import { useDexcalidraw } from '../../hooks/useDexcalidraw'
 import Wordmark from '../Wordmark'
 import DialogButton from './DialogButton'
 
 export default function About() {
   const { setDialogRoute } = useDialogRoute()
-  const { appState } = useExcalidraw()
+  const { appState } = useDexcalidraw()
   const darkMode = useMemo(() => appState?.theme === 'dark', [appState])
 
   return <div className={'relative w-full flex flex-col'}>
