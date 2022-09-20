@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
 import { useDialogRoute } from '../../hooks/useDialogRoute'
 import { useExcalidraw } from '../../hooks/useExcalidraw'

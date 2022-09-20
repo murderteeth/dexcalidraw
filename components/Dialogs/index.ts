@@ -1,9 +1,11 @@
+import About from './About'
 import Open from './Open'
 import Save from './Save'
-import About from './About'
+import Subscription from './Subscription'
 
 export {
-	Open,
+  About,
+  Open,
   Save,
-  About
+  Subscription
 }

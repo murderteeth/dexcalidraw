@@ -25,7 +25,7 @@ export default function Open() {
   const { busy, setBusy } = useBusy()
   const { setDialogRoute } = useDialogRoute()
   const { user } = useMoralis()
-  const {saveFile} = useMoralisFile()
+  const { saveFile } = useMoralisFile()
   const { save: saveDrawing, isSaving } = useNewMoralisObject('Drawing')
   const { drawings } = useDrawings()
   const [preview, setPreview] = useState<HTMLCanvasElement>()
@@ -73,29 +73,38 @@ export default function Open() {
     const name = nameRef.current?.value
     if(!name) return
 
-    const data = {
-      base64: Buffer.from(JSON.stringify({ elements })).toString('base64')
+    setBusy(true)
+    const file = await saveFile(
+      name, 
+      { base64: Buffer.from(JSON.stringify({ elements })).toString('base64') }, 
+      { saveIPFS: true })
+    if(!file) {
+      excalidrawApi?.setToastMessage('Save failed!')
+      throw 'Save failed!'
     }
 
     if(!dexcalidraw.id) {
-      setBusy(true)
-      const file = await saveFile(name, data, { saveIPFS: true })
       const drawing = await saveDrawing({
         owner: user,
         name, file
       })
+
+      if(!drawing) {
+        excalidrawApi?.setToastMessage('Save failed!')
+        throw 'Save failed!'
+      }
+
       setDexcalidraw({ id: drawing.id, name })
       excalidrawApi?.setToastMessage(`${name}.. saved`)
       // setBusy(false) <-- don't set false here.. let the isSaving effect hook handle it
 
     } else {
-      setBusy(true)
-      const file = await saveFile(name, data, { saveIPFS: true })
       const drawing = drawings.find(drawing => drawing.id === dexcalidraw.id)
       if(!drawing) throw `You call that a drawing? ${dexcalidraw.id}`
       drawing.set('name', name)
       drawing.set('file', file)
       await drawing.save()
+
       setDexcalidraw({ id: dexcalidraw.id, name })
       excalidrawApi?.setToastMessage(`${name}.. updated`)
       setBusy(false)
@@ -103,7 +112,7 @@ export default function Open() {
     }
   }, [
     nameRef, 
-    saveFile, 
+    saveFile,
     saveDrawing, 
     elements, 
     drawings, 

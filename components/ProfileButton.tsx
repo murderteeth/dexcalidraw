@@ -40,6 +40,9 @@ export default function ProfileButton() {
         <Option onClick={() => setDialogRoute('save')}>
           {'Save'}
         </Option>
+        <Option onClick={() => setDialogRoute('subscription')}>
+          {'Subscription'}
+        </Option>
         <Option onClick={() =>
             window.open(`https://etherscan.io/address/${account}`, '_blank', 'noreferrer')
           }
