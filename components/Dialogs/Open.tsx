@@ -6,17 +6,20 @@ import { AiOutlineClose, AiOutlineDelete } from 'react-icons/ai'
 import Busy, { useBusy } from '../Busy'
 import { useDialogRoute } from '../../hooks/useDialogRoute'
 import DialogButton from './DialogButton'
+import { useDexcalidraw } from '../../hooks/useDexcalidraw'
 
 export default function Open() {
   const { setBusy } = useBusy()
   const { setDialogRoute } = useDialogRoute()
-  const {toggleSelectionMode, selectionMode, selection} = useSelection()
+  const { toggleSelectionMode, selectionMode, selection } = useSelection()
+  const { refreshQuota } = useDexcalidraw()
 
   const onDeleteSelection = useCallback(async () => {
     if(confirm('Sure about that?')) {
       setBusy(true)
       for(let drawing of selection) await drawing.destroy()
       toggleSelectionMode()
+      refreshQuota()
       setBusy(false)
     }
   }, [setBusy, selection, toggleSelectionMode])

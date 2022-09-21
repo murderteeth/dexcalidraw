@@ -2,14 +2,19 @@ import { useMoralis } from 'react-moralis'
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import { truncateAddress } from '../utilities'
 import { useDialogRoute } from '../hooks/useDialogRoute'
+import { useDexcalidraw } from '../hooks/useDexcalidraw'
+import chains from '../chains.json'
+import { useCallback, useMemo } from 'react'
 
 function Option({onClick, className, children} : {onClick?: () => void, className?: string, children: any}) {
   return <div onClick={onClick}
     className={`
     w-full px-16 py-4 h-fit
-    bg-gray-100 hover:bg-gray-200
+    flex items-center justify-between
     dark:text-purple-100
-    dark:bg-[#363636] dark:hover:bg-[#1f1f1f]
+    bg-[#eaecef] dark:bg-[#363636]
+    hover:bg-[#ced4da] dark:hover:bg-[#272727]
+    active:bg-[#adb5bd] active:dark:bg-[#222]
     first:rounded-t-lg last:rounded-b-lg
     whitespace-nowrap cursor-pointer shadow-md
     ${className}`}>
@@ -20,6 +25,15 @@ function Option({onClick, className, children} : {onClick?: () => void, classNam
 export default function ProfileButton() {
   const { setDialogRoute } = useDialogRoute()
   const { account, logout } = useMoralis()
+  const { chain, currentDrawing, quota } = useDexcalidraw()
+
+  const onSave = useCallback(() => {
+    if(quota.filled && !currentDrawing.id) {
+      setDialogRoute('subscription')
+    } else {
+      setDialogRoute('save')
+    }
+  }, [quota, currentDrawing, setDialogRoute])
 
   return <div className={'group relative h-full'}>
     <div className={'w-[48px] h-[32px] py-2'}></div>
@@ -37,14 +51,18 @@ export default function ProfileButton() {
         <Option onClick={() => setDialogRoute('open')}>
           {'Open'}
         </Option>
-        <Option onClick={() => setDialogRoute('save')}>
+        <Option onClick={onSave}>
           {'Save'}
         </Option>
         <Option onClick={() => setDialogRoute('subscription')}>
-          {'Free Plan 0/3'}
+          {'Free Plan'}
+          <div className={`ml-4 px-2 py-1 text-xs rounded-lg shadow-sm
+            ${quota.filled ? 'bg-red-400 dark:bg-red-500' : 'bg-purple-400 dark:bg-purple-500'}`}>
+            {`${quota.used} / ${quota.max}`}
+          </div>
         </Option>
         <Option onClick={() =>
-            window.open(`https://etherscan.io/address/${account}`, '_blank', 'noreferrer')
+            window.open(`${chain?.explorer}/address/${account}`, '_blank', 'noreferrer')
           }
           className={'border-t border-t-gray-300 dark:border-t-[#1f1f1f]'}>
           {truncateAddress(account)}

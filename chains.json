@@ -1,6 +1,8 @@
 {
   "opera": {
     "id": 250,
-    "contract": "0xF7D7b0e44950c234Fd2C7a8f14e47C79b3eB67e9"
+    "explorer": "https://ftmscan.com", 
+    "contract": "0xF7D7b0e44950c234Fd2C7a8f14e47C79b3eB67e9",
+    "dai": "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E"
   }
 }

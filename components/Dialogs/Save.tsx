@@ -18,7 +18,8 @@ export default function Open() {
     appState, 
     files, 
     currentDrawing, 
-    setCurrentDrawing 
+    setCurrentDrawing,
+    refreshQuota
   } = useDexcalidraw()
 
   const nameRef = useRef<HTMLInputElement>()
@@ -96,6 +97,7 @@ export default function Open() {
 
       setCurrentDrawing({ id: drawing.id, name })
       excalidrawApi?.setToastMessage(`${name}.. saved`)
+      refreshQuota()
       // setBusy(false) <-- don't set false here.. let the isSaving effect hook handle it
 
     } else {
@@ -120,7 +122,8 @@ export default function Open() {
     setCurrentDrawing,
     excalidrawApi,
     setBusy,
-    user
+    user,
+    refreshQuota
   ])
 
   return <div className={'relative w-full flex flex-col'}>
