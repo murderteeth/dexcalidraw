@@ -8,15 +8,19 @@ import DialogRouteProvider from '../hooks/useDialogRoute'
 import { BusyProvider } from '../components/Busy'
 import DrawingsProvider from '../hooks/useDrawings'
 import SelectionProvider from '../hooks/useSelection'
+import useLocalStorage from 'use-local-storage'
 
 function MyApp({ Component, pageProps }: AppProps) {
   function EnableWeb3({ children }: { children: any }) {
+    const [web3EnabledPreviously] = useLocalStorage<boolean>('web3EnabledPreviously', false)
     const { enableWeb3 } = useMoralis()
     useEffect(() => {
-      (async () => {
-        await enableWeb3()
-      })()
-    }, [enableWeb3])
+      if(web3EnabledPreviously) {
+        (async () => {
+          await enableWeb3()
+        })()
+      }
+    }, [web3EnabledPreviously, enableWeb3])
     return <>{children}</>
   }
 

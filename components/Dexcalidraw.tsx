@@ -7,10 +7,10 @@ import { useDexcalidraw } from '../hooks/useDexcalidraw'
 import ProfileButton from './ProfileButton'
 import SignIn from './SignIn'
 import Wordmark from './Wordmark'
-import chains from '../chains.json'
+import Connect from './Connect'
 
 function TopRightUi() {
-  const {  isAuthenticated } = useMoralis()
+  const {  isAuthenticated, isWeb3Enabled } = useMoralis()
   const { setDialogRoute } = useDialogRoute()
   const { chain } = useDexcalidraw()
 
@@ -22,13 +22,14 @@ function TopRightUi() {
     <div className={`
       px-4 py-2 flex items-center gap-4 shadow-md rounded-lg`}>
       <div onClick={() => setDialogRoute('about')} className={'cursor-pointer'}>
-        {isChainSupported && <Wordmark />}
-        {!isChainSupported && <div className={'px-4 py-2 text-xl text-red-400'}>
-          {`Network ${chain.id} not supported!`}
+        {(!isWeb3Enabled || isChainSupported) && <Wordmark />}
+        {isWeb3Enabled && !isChainSupported && <div className={'px-4 py-2 text-xl text-red-400'}>
+          {`Network not supported!`}
         </div>}
       </div>
-      {isAuthenticated && isChainSupported && <ProfileButton />}
-      {!isAuthenticated && isChainSupported && <SignIn />}
+      {!isWeb3Enabled && <Connect />}
+      {isWeb3Enabled && isAuthenticated && isChainSupported && <ProfileButton />}
+      {isWeb3Enabled && !isAuthenticated && isChainSupported && <SignIn />}
     </div>
   </div>
 }
