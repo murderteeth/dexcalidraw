@@ -1,4 +1,16 @@
 {
+  "mainnet": {
+    "id": 1,
+    "explorer": "https://etherscan.com", 
+    "subscriptions": "0x5C1E83d1Bb627A6EF8312eeB5d931ec20855F1BE",
+    "dai": "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+  },
+  "polygon": {
+    "id": 137,
+    "explorer": "https://polygonscan.com", 
+    "subscriptions": "0x4d22D1101cE946eCDfd19Cf54d97D1597b5bA747",
+    "dai": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
+  },
   "opera": {
     "id": 250,
     "explorer": "https://ftmscan.com", 

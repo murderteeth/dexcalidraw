@@ -4,14 +4,13 @@ import { useDialogRoute } from '../../../hooks/useDialogRoute'
 import { Button } from '../../controls'
 import Wordmark from '../../Wordmark'
 import DialogButton from '../DialogButton'
-import Hexagon from './Hexagon'
-import QR from './QR'
 import { useDexcalidraw } from '../../../hooks/useDexcalidraw'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumber, ethers } from 'ethers'
 import erc20 from '../../../abi/erc20.json'
 import subscriptions from '../../../abi/subscriptions.json'
 import Busy, { useBusy } from '../../Busy'
+import Pendragon from '../../Pendragon'
 
 export default function Mint() {
   const { busy, setBusy } = useBusy()
@@ -143,9 +142,9 @@ export default function Mint() {
           setTimeout(() => {
             setIsConfirmingSubscription(false)
             setBusy(false)
-            setDialogRoute('subscription')
-          }, 1000) // ugh
-        }, 1000)
+            setDialogRoute('thanks')
+          }, 1000) // UGH
+        }, 1000) // ugh
       })
     }
   }, [subscribeResult, refreshSubscription, fetchDaiBalance, fetchAllowance, setIsConfirmingSubscription, setDialogRoute, setBusy])
@@ -193,8 +192,7 @@ export default function Mint() {
           {renewal && 'Renew the Pendragon Plan now and continue storing up to 1 GB of drawings for another year.'}
         </p>
         <div className={'relative flex items-center justify-center'}>
-          <Hexagon className={'w-64 h-64 stroke-purple-500'} />
-          <QR className={'absolute w-32 h-32 stroke-purple-500 fill-amber-400'} />
+          <Pendragon className={'w-64 h-64 stroke-purple-500 fill-red-400 dark:fill-red-600'} />
         </div>
         <div className={'flex flex-col items-center gap-4'}>
           <p>
