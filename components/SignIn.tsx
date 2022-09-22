@@ -1,7 +1,15 @@
+import { useEffect } from 'react'
 import { useMoralis } from 'react-moralis'
+import { useDexcalidraw } from '../hooks/useDexcalidraw'
 
 export default function SignIn() {
-  const { authenticate } = useMoralis()
+  const { authenticate, isAuthenticated } = useMoralis()
+  const { refreshSubscription } = useDexcalidraw()
+
+  useEffect(() => {
+    if(isAuthenticated) refreshSubscription()
+  }, [isAuthenticated, refreshSubscription])
+
   return <button
     onClick={() => authenticate({
       signingMessage: 'Please sign this message to confirm your identity.'})}>

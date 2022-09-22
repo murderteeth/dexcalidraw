@@ -10,16 +10,13 @@ import Wordmark from './Wordmark'
 import chains from '../chains.json'
 
 function TopRightUi() {
-  const {  isInitialized: isMoralisInitialized, isAuthenticated, Moralis } = useMoralis()
+  const {  isAuthenticated } = useMoralis()
   const { setDialogRoute } = useDialogRoute()
-
-  const chainId = useMemo(() => {
-    return Moralis.getChainId()
-  }, [isMoralisInitialized, Moralis])
+  const { chain } = useDexcalidraw()
 
   const isChainSupported = useMemo(() => {
-    return Object.values(chains).some(chain => chain.id === parseInt(chainId || '0'))
-  }, [chainId])
+    return chain.id !== 0
+  }, [chain])
 
   return <div className={'Island'}>
     <div className={`
@@ -27,7 +24,7 @@ function TopRightUi() {
       <div onClick={() => setDialogRoute('about')} className={'cursor-pointer'}>
         {isChainSupported && <Wordmark />}
         {!isChainSupported && <div className={'px-4 py-2 text-xl text-red-400'}>
-          {`Network ${chainId} not supported!`}
+          {`Network ${chain.id} not supported!`}
         </div>}
       </div>
       {isAuthenticated && isChainSupported && <ProfileButton />}

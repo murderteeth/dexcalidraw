@@ -9,6 +9,7 @@ export default function DrawingsProvider({ children } : { children: any }) {
   const { setBusy } = useBusy()
   const [ drawings, setDrawings ] = useState([] as Moralis.Object[])
   const { user } = useMoralis()
+
   const { data, isLoading } = useMoralisQuery(
     'Drawing',
     query => query.equalTo('owner', user),

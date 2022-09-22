@@ -16,7 +16,7 @@ export interface ExcalidrawModule {
 export interface Chain {
   id: number,
   explorer: string,
-  contract: string,
+  subscriptions: string,
   dai: string
 }
 
@@ -37,6 +37,7 @@ export interface Subscription {
 }
 
 interface DexcalidrawState {
+  ready: boolean,
   chain: Chain,
   excalidrawModule: ExcalidrawModule,
   excalidrawApi: ExcalidrawImperativeAPI|null,
@@ -64,15 +65,23 @@ export default function DexcalidrawProvider({ children } : { children: any }) {
   const [files, setFiles] = useLocalStorage<BinaryFiles|null>('files', null)
   const [currentDrawing, setCurrentDrawing] = useLocalStorage<CurrentDrawing>('currentDrawing', { id: '', name: '' })
 
-  const { isInitialized: isMoralisInitialized, Moralis } = useMoralis()
+  const { isAuthenticated, isInitialized: isMoralisInitialized, Moralis, chainId: moralisChainId } = useMoralis()
+  const ready = useMemo(() => isMoralisInitialized, [isMoralisInitialized])
+   
   const chainId = useMemo(() => {
-    return Moralis.getChainId() || '0x00'
-  }, [isMoralisInitialized, Moralis])
+    if(isMoralisInitialized) {
+      console.log('moralisChainId', moralisChainId)
+      if(moralisChainId) return moralisChainId
+      const result = Moralis.getChainId()
+      return result || '0x00'
+    }
+    return '0x00'
+  }, [isMoralisInitialized, moralisChainId, Moralis])
 
   const chain = useMemo<Chain>(() => {
     const result = Object.values(chains).find(chain => chain.id === parseInt(chainId))
-    if(result) return result
-    return { id: 0, explorer: '', contract: '', dai: ''} as Chain
+    if(result) return (result as Chain)
+    return { id: 0, explorer: '', subscriptions: '', dai: ''} as Chain
   }, [chainId])
 
   const { fetch: fetchSubscription } = useMoralisCloudFunction('subscription', { }, { autoFetch: false })
@@ -82,7 +91,7 @@ export default function DexcalidrawProvider({ children } : { children: any }) {
   })
 
   const refreshSubscription = useCallback(() => {
-    if(isMoralisInitialized) {
+    if(isMoralisInitialized && isAuthenticated) {
       fetchSubscription({
         onSuccess: (results) => {
           const used = (results as any).used
@@ -95,7 +104,7 @@ export default function DexcalidrawProvider({ children } : { children: any }) {
         onError: (error) => console.error('fetchSubscription', error)
       })
     }
-  }, [fetchSubscription, isMoralisInitialized])
+  }, [fetchSubscription, isMoralisInitialized, isAuthenticated])
 
   useEffect(() => {
     refreshSubscription()
@@ -108,6 +117,7 @@ export default function DexcalidrawProvider({ children } : { children: any }) {
   }, [])
 
 	return <DexcalidrawContext.Provider value={{
+    ready,
     chain,
     excalidrawModule: module,
     excalidrawApi: api, setExcalidrawApi: setApi,

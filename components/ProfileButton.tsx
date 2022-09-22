@@ -3,7 +3,7 @@ import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import { truncateAddress } from '../utilities'
 import { useDialogRoute } from '../hooks/useDialogRoute'
 import { useDexcalidraw } from '../hooks/useDexcalidraw'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 function Option({onClick, className, children} : {onClick?: () => void, className?: string, children: any}) {
   return <div onClick={onClick}
@@ -24,7 +24,7 @@ function Option({onClick, className, children} : {onClick?: () => void, classNam
 export default function ProfileButton() {
   const { setDialogRoute } = useDialogRoute()
   const { account, logout } = useMoralis()
-  const { chain, currentDrawing, subscription } = useDexcalidraw()
+  const { chain, currentDrawing, resetCurrentDrawing, subscription } = useDexcalidraw()
 
   const onSave = useCallback(() => {
     if(subscription.filled && !currentDrawing.id) {
@@ -33,6 +33,11 @@ export default function ProfileButton() {
       setDialogRoute('save')
     }
   }, [subscription, currentDrawing, setDialogRoute])
+
+  const onLogout = useCallback(() => {
+    resetCurrentDrawing()
+    logout()
+  }, [logout, resetCurrentDrawing])
 
   return <div className={'group relative h-full'}>
     <div className={'w-[48px] h-[32px] py-2'}></div>
@@ -66,7 +71,7 @@ export default function ProfileButton() {
           className={'border-t border-t-gray-300 dark:border-t-[#1f1f1f]'}>
           {truncateAddress(account)}
         </Option>
-        <Option onClick={logout} className={''}>
+        <Option onClick={onLogout} className={''}>
           {'Sign out'}
         </Option>
       </div>
