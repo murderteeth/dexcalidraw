@@ -1,3 +1,17 @@
+![image](https://user-images.githubusercontent.com/89237203/191858936-c48bd0d6-9055-4bd1-ae45-77bf3e8cd8b7.png)
+
+
+Dexcalidraw is a virtual whiteboard for sketching hand-drawn like diagrams with low cost subscriptions for freelancers and casual users.
+
+Looking for Dexcalidraw's smart contracts?
+[Here you go!](https://github.com/murderteeth/dexcalidraw-contracts)
+
+
+✒ Happy drawing!
+
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

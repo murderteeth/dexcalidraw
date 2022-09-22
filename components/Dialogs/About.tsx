@@ -27,8 +27,8 @@ export default function About() {
       flex flex-col items-center justify-center 
       dark:text-purple-500`}>
       <Wordmark className={'text-8xl'} glow={darkMode} shadow={!darkMode} />
-      <p className={'my-4 text-2xl'}>
-        {'Access your Excalidraw work anywhere'}
+      <p className={'max-w-4xl my-4 text-2xl text-center'}>
+        {'Virtual whiteboard for sketching hand-drawn like diagrams with low subscription costs for freelancers and casual users. Your first three drawings are on us!'}
       </p>
 
       <div className={'my-4 text-xl'}>
