@@ -70,7 +70,6 @@ export default function DexcalidrawProvider({ children } : { children: any }) {
    
   const chainId = useMemo(() => {
     if(isMoralisInitialized) {
-      console.log('moralisChainId', moralisChainId)
       if(moralisChainId) return moralisChainId
       const result = Moralis.getChainId()
       return result || '0x00'

@@ -11,16 +11,19 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumber, ethers } from 'ethers'
 import erc20 from '../../../abi/erc20.json'
 import subscriptions from '../../../abi/subscriptions.json'
+import Busy, { useBusy } from '../../Busy'
 
 export default function Mint() {
+  const { busy, setBusy } = useBusy()
   const { setDialogRoute } = useDialogRoute()
-  const { appState, subscription } = useDexcalidraw()
+  const { appState, subscription, refreshSubscription } = useDexcalidraw()
   const darkMode = useMemo(() => appState?.theme === 'dark', [appState])
   const fee = useMemo(() => ethers.utils.parseEther('10'), [])
   const { account, isInitialized: isMoralisInitialized } = useMoralis()
   const { chain } = useDexcalidraw()
   const [daiBalance, setDaiBalance] = useState(BigNumber.from('-1'))
-  const [resetFlow, setResetFlow] = useState(false)
+  const [allowance, setAllowance] = useState(BigNumber.from('-1'))
+
   const renewal = useMemo(() => {
     return !(subscription.nft.token === 0 || subscription.nft.expired)
   }, [subscription])
@@ -71,6 +74,23 @@ export default function Mint() {
     msgValue: 0,
   })
 
+  const {
+    data: allowanceRaw,
+    runContractFunction: fetchAllowance,
+    isLoading: isLoadingFetchAllowance,
+    isFetching: isFetchingAllowance,
+    error: fetchAllowanceError
+  } = useWeb3Contract({
+    abi: erc20,
+    contractAddress: chain.dai,
+    functionName: 'allowance',
+    params: { 
+      'owner': account,
+      'spender': chain.subscriptions
+    },
+    msgValue: 0,
+  })
+
   const { 
     data: subscribeResult,
     runContractFunction: subscribe,
@@ -86,29 +106,70 @@ export default function Mint() {
   })
 
   useEffect(() => {
-    if(subscribeError) setResetFlow(true)
-  }, [subscribeError, setResetFlow])
+    if(isMoralisInitialized && !isLoadingFetchDaiBalance) {
+      fetchAllowance()
+    }
+  }, [isMoralisInitialized, isLoadingFetchDaiBalance, fetchAllowance])
 
   useEffect(() => {
-    if(approveDaiResult && !isLoadingSubscribe && !resetFlow) {
-      subscribe()
-    }
-  }, [approveDaiResult, isLoadingSubscribe, subscribe, resetFlow])
+    if(allowanceRaw) setAllowance(allowanceRaw as BigNumber)
+  }, [allowanceRaw])
 
+  const [isConfirmingApproval, setIsConfirmingApproval] = useState(false)
+  useEffect(() => {
+    if(approveDaiResult) {
+      setIsConfirmingApproval(true);
+      (approveDaiResult as any).wait(2).then(() => {
+        setIsConfirmingApproval(false)
+        setBusy(false)
+        fetchAllowance()
+      })
+    }
+  }, [approveDaiResult, fetchAllowance, setBusy, setIsConfirmingApproval])
+
+  useEffect(() => {
+    if(approveDaiError) setBusy(false)
+  }, [approveDaiError, setBusy])
+
+  const [isConfirmingSubscription, setIsConfirmingSubscription] = useState(false)
   useEffect(() => {
     if(subscribeResult) {
-      fetchDaiBalance()
+      setIsConfirmingSubscription(true);
+      (subscribeResult as any).wait(2).then(() => {
+        setTimeout(() => {
+          refreshSubscription()
+          fetchDaiBalance()
+          fetchAllowance()
+          setTimeout(() => {
+            setIsConfirmingSubscription(false)
+            setBusy(false)
+            setDialogRoute('subscription')
+          }, 1000) // ugh
+        }, 1000)
+      })
     }
-  }, [subscribeResult, fetchDaiBalance])
+  }, [subscribeResult, refreshSubscription, fetchDaiBalance, fetchAllowance, setIsConfirmingSubscription, setDialogRoute, setBusy])
 
-  const onStartFlow = useCallback(async () => {
+  useEffect(() => {
+    if(subscribeError) setBusy(false)
+  }, [subscribeError, setBusy])
+
+  const onApprove = useCallback(() => {
     if(!isLoadingApproveDai) {
-      setResetFlow(false)
+      setBusy(true)
       approveDai()
     }
-  }, [isLoadingApproveDai, setResetFlow, approveDai])
+  }, [isLoadingApproveDai, approveDai, setBusy])
+
+  const onSubscribe = useCallback(() => {
+    if(!isLoadingSubscribe) {
+      setBusy(true)
+      subscribe()
+    }
+  }, [isLoadingSubscribe, subscribe, setBusy])
 
   return <div className={'relative w-full flex flex-col'}>
+    <Busy />
     <div>
       <div className={`
         w-full px-8 flex items-center justify-end`}>
@@ -128,7 +189,7 @@ export default function Mint() {
       <div className={'w-1/2 px-32 flex flex-col items-center gap-2'}>
         <Wordmark word={'Pendragon Plan'} className={'text-5xl'} glow={darkMode} shadow={!darkMode} />
         <p className={'text-lg'}>
-          {!renewal && 'Subscribe to the Pendragon Plan now and store up to 1 GB of drawings for a year!'}
+          {!renewal && 'Subscribe to the Pendragon Plan for 10 DAI and store up to 1 GB of drawings for a year!'}
           {renewal && 'Renew the Pendragon Plan now and continue storing up to 1 GB of drawings for another year.'}
         </p>
         <div className={'relative flex items-center justify-center'}>
@@ -144,11 +205,19 @@ export default function Mint() {
             {'DAI'}
           </p>
 
-          <Button onClick={onStartFlow} 
-            disabled={daiBalance.lt(fee) || isApprovingDai || isSubscribing}
-            className={`w-96 ${(isApprovingDai || isSubscribing) ? 'dark:disabled:text-red-400' : ''}`}>
-            {isApprovingDai ? 'Approving 10 DAI..' : isSubscribing ? 'Minting NFT..' : renewal ? 'Renew for 10 DAI' : 'Subscribe now for 10 DAI'}
-          </Button>
+          <div className={'flex items-center gap-4'}>
+            <Button onClick={onApprove}
+              disabled={busy || daiBalance.lt(fee) || allowance.gte(fee) || isApprovingDai || isConfirmingApproval}
+              className={`w-48 ${(isApprovingDai || isConfirmingApproval) ? 'dark:disabled:text-red-400' : ''}`}>
+              {isApprovingDai ? 'Approving 10 DAI..' : isConfirmingApproval ? 'Confirming..' : allowance.gte(fee) ? '10 DAI Approved' : 'Approve 10 DAI'}
+            </Button>
+
+            <Button onClick={onSubscribe}
+              disabled={busy || daiBalance.lt(fee) || allowance.lt(fee) || isSubscribing || isConfirmingSubscription}
+              className={`w-48 ${(isSubscribing || isConfirmingSubscription) ? 'dark:disabled:text-red-400' : ''}`}>
+              {isSubscribing ? 'Minting NFT..' : isConfirmingSubscription ? 'Confirming..' : renewal ? 'Renew' : 'Subscribe'}
+            </Button>
+          </div>
 
           {daiBalance.gte(0) && daiBalance.lt(fee) && <p className={'text-red-400'}>{'DAI balance too low'}</p>}
 
