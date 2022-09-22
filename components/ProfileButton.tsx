@@ -3,13 +3,12 @@ import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import { truncateAddress } from '../utilities'
 import { useDialogRoute } from '../hooks/useDialogRoute'
 import { useDexcalidraw } from '../hooks/useDexcalidraw'
-import chains from '../chains.json'
 import { useCallback, useMemo } from 'react'
 
 function Option({onClick, className, children} : {onClick?: () => void, className?: string, children: any}) {
   return <div onClick={onClick}
     className={`
-    w-full px-16 py-4 h-fit
+    relative w-full px-16 py-4 h-fit
     flex items-center justify-between
     dark:text-purple-100
     bg-[#eaecef] dark:bg-[#363636]
@@ -25,15 +24,15 @@ function Option({onClick, className, children} : {onClick?: () => void, classNam
 export default function ProfileButton() {
   const { setDialogRoute } = useDialogRoute()
   const { account, logout } = useMoralis()
-  const { chain, currentDrawing, quota } = useDexcalidraw()
+  const { chain, currentDrawing, subscription } = useDexcalidraw()
 
   const onSave = useCallback(() => {
-    if(quota.filled && !currentDrawing.id) {
+    if(subscription.filled && !currentDrawing.id) {
       setDialogRoute('subscription')
     } else {
       setDialogRoute('save')
     }
-  }, [quota, currentDrawing, setDialogRoute])
+  }, [subscription, currentDrawing, setDialogRoute])
 
   return <div className={'group relative h-full'}>
     <div className={'w-[48px] h-[32px] py-2'}></div>
@@ -55,10 +54,10 @@ export default function ProfileButton() {
           {'Save'}
         </Option>
         <Option onClick={() => setDialogRoute('subscription')}>
-          {'Free Plan'}
-          <div className={`ml-4 px-2 py-1 text-xs rounded-lg shadow-sm
-            ${quota.filled ? 'bg-red-400 dark:bg-red-500' : 'bg-purple-400 dark:bg-purple-500'}`}>
-            {`${quota.used} / ${quota.max}`}
+          {subscription.nft.token === 0 ? 'Free Plan' : 'Pendragon Plan'}
+          <div className={`ml-4 -mr-8 px-2 py-1 text-xs rounded-lg shadow-sm
+            ${(subscription.filled || subscription.nft.expired) ? 'bg-red-400 dark:bg-red-500' : 'bg-purple-400 dark:bg-purple-500'}`}>
+            {`${subscription.used} / ${subscription.max}`}
           </div>
         </Option>
         <Option onClick={() =>

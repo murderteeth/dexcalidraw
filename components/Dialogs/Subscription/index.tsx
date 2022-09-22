@@ -3,10 +3,11 @@ import { useDexcalidraw } from '../../../hooks/useDexcalidraw'
 import { useDialogRoute } from '../../../hooks/useDialogRoute'
 import DialogButton from '../DialogButton'
 import FreePlan from './FreePlan'
+import PendragonPlan from './PendragonPlan'
 
 export default function Subscription() {
   const { setDialogRoute } = useDialogRoute()
-  const { quota } = useDexcalidraw()
+  const { subscription } = useDexcalidraw()
 
   return <div className={'relative w-full flex flex-col'}>
     <div>
@@ -24,7 +25,8 @@ export default function Subscription() {
       w-full h-full max-w-full max-h-full 
       flex items-center justify-center 
       dark:text-purple-500`}>
-      <FreePlan className={'w-1/2 px-24'} />
+      {(subscription.nft.token === 0 || subscription.nft.expired) && <FreePlan className={'w-1/2 px-24'} />}
+      {!(subscription.nft.token === 0 || subscription.nft.expired) && <PendragonPlan className={'w-1/2 px-24'} />}
     </div>
   </div>
 }

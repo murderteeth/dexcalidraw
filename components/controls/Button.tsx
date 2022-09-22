@@ -6,7 +6,8 @@ export default function Button(
     disabled={disabled}
     className={`
     px-6 py-3 flex items-center justify-center
-    dark:text-purple-100 disabled:text-gray-400
+    dark:text-purple-100 
+    disabled:text-gray-400 dark:disabled:text-gray-600
     bg-[#eaecef] dark:bg-[#363636]
     hover:bg-[#ced4da] dark:hover:bg-[#272727]
     active:bg-[#adb5bd] active:dark:bg-[#222]

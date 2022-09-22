@@ -10,8 +10,13 @@ import Wordmark from './Wordmark'
 import chains from '../chains.json'
 
 function TopRightUi() {
-  const { isAuthenticated, chainId } = useMoralis()
+  const {  isInitialized: isMoralisInitialized, isAuthenticated, Moralis } = useMoralis()
   const { setDialogRoute } = useDialogRoute()
+
+  const chainId = useMemo(() => {
+    return Moralis.getChainId()
+  }, [isMoralisInitialized, Moralis])
+
   const isChainSupported = useMemo(() => {
     return Object.values(chains).some(chain => chain.id === parseInt(chainId || '0'))
   }, [chainId])

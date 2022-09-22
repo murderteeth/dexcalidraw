@@ -12,17 +12,20 @@ export default function Open() {
   const { setBusy } = useBusy()
   const { setDialogRoute } = useDialogRoute()
   const { toggleSelectionMode, selectionMode, selection } = useSelection()
-  const { refreshQuota } = useDexcalidraw()
+  const { refreshSubscription, currentDrawing, resetCurrentDrawing } = useDexcalidraw()
 
   const onDeleteSelection = useCallback(async () => {
     if(confirm('Sure about that?')) {
       setBusy(true)
-      for(let drawing of selection) await drawing.destroy()
+      for(let drawing of selection) {
+        if(drawing.id === currentDrawing.id) resetCurrentDrawing()
+        await drawing.destroy()
+      }
       toggleSelectionMode()
-      refreshQuota()
+      refreshSubscription()
       setBusy(false)
     }
-  }, [setBusy, selection, toggleSelectionMode])
+  }, [setBusy, selection, toggleSelectionMode, refreshSubscription, currentDrawing, resetCurrentDrawing])
 
   return <div className={'relative w-full flex flex-col'}>
     <Busy />

@@ -6,32 +6,40 @@ import Wordmark from '../../Wordmark'
 import DialogButton from '../DialogButton'
 import Hexagon from './Hexagon'
 import QR from './QR'
-import erc20 from '../../../abi/erc20.json'
 import { useDexcalidraw } from '../../../hooks/useDexcalidraw'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { BigNumber, ethers } from 'ethers'
+import erc20 from '../../../abi/erc20.json'
+import subscriptions from '../../../abi/subscriptions.json'
 
 export default function Mint() {
   const { setDialogRoute } = useDialogRoute()
-  const { appState } = useDexcalidraw()
+  const { appState, subscription } = useDexcalidraw()
   const darkMode = useMemo(() => appState?.theme === 'dark', [appState])
+  const fee = useMemo(() => ethers.utils.parseEther('10'), [])
   const { account, isInitialized: isMoralisInitialized } = useMoralis()
   const { chain } = useDexcalidraw()
+  const [daiBalance, setDaiBalance] = useState(BigNumber.from('-1'))
+  const [resetFlow, setResetFlow] = useState(false)
+  const renewal = useMemo(() => {
+    return !(subscription.nft.token === 0 || subscription.nft.expired)
+  }, [subscription])
 
-  function formatNumber(number : number, decimals = 2){
-    return number.toLocaleString(undefined, {minimumFractionDigits: decimals, maximumFractionDigits: decimals})
+  function formatDai(balance: BigNumber){
+    return parseFloat(ethers.utils.formatEther(balance))
+      .toLocaleString(navigator.language, {minimumFractionDigits: 2, maximumFractionDigits: 2})
   }
 
   const { 
-    data: daiBalance, 
+    data: daiBalanceRaw,
     runContractFunction: fetchDaiBalance,
-    isLoading: isLoadingFetchDaiBalance,
-    error: fetchDaiBalanceError
+    isLoading: isLoadingFetchDaiBalance
   } = useWeb3Contract({
     abi: erc20,
     contractAddress: chain.dai,
     functionName: 'balanceOf',
     params: { 
-      '': '0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E'
+      '': account
     },
     msgValue: 0,
   })
@@ -43,8 +51,62 @@ export default function Mint() {
   }, [isMoralisInitialized, isLoadingFetchDaiBalance, fetchDaiBalance])
 
   useEffect(() => {
-    if(fetchDaiBalanceError) console.error('fetchDaiBalanceError', fetchDaiBalanceError)
-  }, [fetchDaiBalanceError])
+    if(daiBalanceRaw) setDaiBalance(daiBalanceRaw as BigNumber)
+  }, [daiBalanceRaw])
+
+  const {
+    data: approveDaiResult,
+    runContractFunction: approveDai,
+    isLoading: isLoadingApproveDai,
+    isFetching: isApprovingDai,
+    error: approveDaiError
+  } = useWeb3Contract({
+    abi: erc20,
+    contractAddress: chain.dai,
+    functionName: 'approve',
+    params: { 
+      'usr': chain.subscriptions,
+      'wad': fee
+    },
+    msgValue: 0,
+  })
+
+  const { 
+    data: subscribeResult,
+    runContractFunction: subscribe,
+    isLoading: isLoadingSubscribe,
+    isFetching: isSubscribing,
+    error: subscribeError
+  } = useWeb3Contract({
+    abi: subscriptions,
+    contractAddress: chain.subscriptions,
+    functionName: 'subscribe',
+    params: {},
+    msgValue: 0,
+  })
+
+  useEffect(() => {
+    if(subscribeError) setResetFlow(true)
+  }, [subscribeError, setResetFlow])
+
+  useEffect(() => {
+    if(approveDaiResult && !isLoadingSubscribe && !resetFlow) {
+      subscribe()
+    }
+  }, [approveDaiResult, isLoadingSubscribe, subscribe, resetFlow])
+
+  useEffect(() => {
+    if(subscribeResult) {
+      fetchDaiBalance()
+    }
+  }, [subscribeResult, fetchDaiBalance])
+
+  const onStartFlow = useCallback(async () => {
+    if(!isLoadingApproveDai) {
+      setResetFlow(false)
+      approveDai()
+    }
+  }, [isLoadingApproveDai, setResetFlow, approveDai])
 
   return <div className={'relative w-full flex flex-col'}>
     <div>
@@ -66,7 +128,8 @@ export default function Mint() {
       <div className={'w-1/2 px-32 flex flex-col items-center gap-2'}>
         <Wordmark word={'Pendragon Plan'} className={'text-5xl'} glow={darkMode} shadow={!darkMode} />
         <p className={'text-lg'}>
-          {'Subscribe to the Pendragon Plan now and store up to 2 GB of drawings for a year!'}
+          {!renewal && 'Subscribe to the Pendragon Plan now and store up to 1 GB of drawings for a year!'}
+          {renewal && 'Renew the Pendragon Plan now and continue storing up to 1 GB of drawings for another year.'}
         </p>
         <div className={'relative flex items-center justify-center'}>
           <Hexagon className={'w-64 h-64 stroke-purple-500'} />
@@ -76,11 +139,19 @@ export default function Mint() {
           <p>
             {'Your Balance is'}
             <span className={'mx-2 font-mono dark:text-purple-100'}>
-              {daiBalance ? formatNumber(daiBalance) : '-.--'}
+              {daiBalance ? formatDai(daiBalance).toString() : '-.--'}
             </span>
             {'DAI'}
           </p>
-          <Button>{'Subscribe now for 20 DAI'}</Button>
+
+          <Button onClick={onStartFlow} 
+            disabled={daiBalance.lt(fee) || isApprovingDai || isSubscribing}
+            className={`w-96 ${(isApprovingDai || isSubscribing) ? 'dark:disabled:text-red-400' : ''}`}>
+            {isApprovingDai ? 'Approving 10 DAI..' : isSubscribing ? 'Minting NFT..' : renewal ? 'Renew for 10 DAI' : 'Subscribe now for 10 DAI'}
+          </Button>
+
+          {daiBalance.gte(0) && daiBalance.lt(fee) && <p className={'text-red-400'}>{'DAI balance too low'}</p>}
+
         </div>
       </div>
 

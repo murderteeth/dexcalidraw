@@ -25,10 +25,15 @@ export interface CurrentDrawing {
   name: string
 }
 
-export interface Quota {
+export interface Subscription {
   used: number,
   max: number,
-  filled: boolean
+  filled: boolean,
+  nft: {
+    token: number,
+    expired: boolean,
+    expiration: number
+  }
 }
 
 interface DexcalidrawState {
@@ -45,8 +50,8 @@ interface DexcalidrawState {
   currentDrawing: { id: string, name: string }
   setCurrentDrawing: (state: CurrentDrawing) => void,
   resetCurrentDrawing: () => void,
-  quota: Quota,
-  refreshQuota: () => void
+  subscription: Subscription,
+  refreshSubscription: () => void
 }
 
 const	DexcalidrawContext = createContext({} as DexcalidrawState)
@@ -58,32 +63,43 @@ export default function DexcalidrawProvider({ children } : { children: any }) {
   const [appState, setAppState] = useLocalStorage<AppState|null>('appState', null)
   const [files, setFiles] = useLocalStorage<BinaryFiles|null>('files', null)
   const [currentDrawing, setCurrentDrawing] = useLocalStorage<CurrentDrawing>('currentDrawing', { id: '', name: '' })
-  const { fetch: fetchQuota } = useMoralisCloudFunction('quota', { autoFetch: false })
-  const { isInitialized: isMoralisInitialized, chainId } = useMoralis()
-  const [quota, setQuota] = useState<Quota>({ used: 0, max: 3, filled: false })
+
+  const { isInitialized: isMoralisInitialized, Moralis } = useMoralis()
+  const chainId = useMemo(() => {
+    return Moralis.getChainId() || '0x00'
+  }, [isMoralisInitialized, Moralis])
 
   const chain = useMemo<Chain>(() => {
-    const result = Object.values(chains).find(chain => chain.id === parseInt(chainId || '0'))
+    const result = Object.values(chains).find(chain => chain.id === parseInt(chainId))
     if(result) return result
     return { id: 0, explorer: '', contract: '', dai: ''} as Chain
   }, [chainId])
 
-  const refreshQuota = useCallback(() => {
+  const { fetch: fetchSubscription } = useMoralisCloudFunction('subscription', { }, { autoFetch: false })
+  const [subscription, setSubscription] = useState<Subscription>({ 
+    used: 0, max: 3, filled: false, 
+    nft: { token: 0, expired: false, expiration: 0 } 
+  })
+
+  const refreshSubscription = useCallback(() => {
     if(isMoralisInitialized) {
-      fetchQuota({
+      fetchSubscription({
         onSuccess: (results) => {
           const used = (results as any).used
           const max = (results as any).max
-          setQuota({used, max, filled: used >= max})
+          const nft = (results as any).nft
+          setSubscription({
+            used, max, nft, filled: used >= max
+          })
         },
-        onError: (error) => console.error('fetchQuota', error)
+        onError: (error) => console.error('fetchSubscription', error)
       })
     }
-  }, [fetchQuota, isMoralisInitialized])
+  }, [fetchSubscription, isMoralisInitialized])
 
   useEffect(() => {
-    refreshQuota()
-  }, [refreshQuota])
+    refreshSubscription()
+  }, [refreshSubscription])
 
   useEffect(() => {
     import("@excalidraw/excalidraw").then((module) => {
@@ -100,8 +116,8 @@ export default function DexcalidrawProvider({ children } : { children: any }) {
     files, setFiles,
     currentDrawing: currentDrawing, setCurrentDrawing: setCurrentDrawing, 
     resetCurrentDrawing: () => setCurrentDrawing({ id: '', name: '' }),
-    quota,
-    refreshQuota
+    subscription,
+    refreshSubscription
     }}>
     {children}
   </DexcalidrawContext.Provider>
