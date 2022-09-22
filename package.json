@@ -7,6 +7,7 @@
     "build": "next build && next export",
     "start": "next start",
     "lint": "next lint",
+    "deploy": "firebase deploy --only hosting",
     "watch-moralis": ". ./bin/watch-moralis.sh",
     "watch-logs": ". ./bin/watch-logs.sh"
   },
