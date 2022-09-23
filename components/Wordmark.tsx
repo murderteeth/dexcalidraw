@@ -1,12 +1,13 @@
 export default function Wordmark(
-  { word = 'Dexcalidraw', shadow = false, glow = false, className = '' }: 
-  { word?: string, shadow?: boolean, glow?: boolean, className?: string }) {
+  { word = 'Dexcalidraw', shadow = false, glow = false, hover = false, className = '' }: 
+  { word?: string, shadow?: boolean, glow?: boolean, hover?: boolean, className?: string }) {
   return <div className={`
     relative flex items-center justify-center ${className}`}>
     <div className={`
       ${glow ? 'invisible' : ''}
       font-[Virgil] font-bold text-purple-500 
       whitespace-nowrap
+      ${hover ? 'hover:text-red-400' : ''}
       ${shadow ? 'drop-shadow-lg' : ''}`}>{word}</div>
     <div className={`
       ${glow ? '' : 'hidden'}

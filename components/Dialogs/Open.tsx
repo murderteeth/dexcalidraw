@@ -32,8 +32,9 @@ export default function Open() {
 
     <div>
       {!selectionMode && <div className={`
-        w-full px-8 flex items-center justify-between text-purple-400 shadow-md`}>
-        <Wordmark word={'Open drawing..'} className={'text-2xl'} />
+        w-full px-8 grid grid-cols-3 items-center text-purple-400 shadow-md`}>
+        <Wordmark word={'Open drawing..'} className={'justify-self-start text-2xl'} />
+        <div className={'justify-self-center'}>{'💡 Long-click drawings to select and delete'}</div>
         <div className="flex items-center justify-end gap-8">
           <DialogButton onClick={() => setDialogRoute('')}>
             <AiOutlineClose />

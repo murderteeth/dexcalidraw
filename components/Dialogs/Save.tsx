@@ -34,6 +34,20 @@ export default function Open() {
   const [previewDimensions, setPreviewDimensions] = useState<{width: number, height: number}>({ width: 240, height: 240 })
   const [shhh, setShhh] = useState(true)
 
+  const drawing = useMemo(() => {
+    return drawings.find(drawing => drawing.id === currentDrawing.id)
+  }, [drawings, currentDrawing])
+
+  const [ipfsGatewayUrl, setIpfsGatewayUrl] = useState('')
+  useEffect(() => {
+    if(drawing) {
+      const file = drawing.get('file')
+      const hash = file._name?.replace('.txt', '')
+      const url = `https://ipfs.moralis.io:2053/ipfs/${hash}`
+      setIpfsGatewayUrl(url)
+    }
+  }, [drawing])
+
   const defaultName = useMemo(() => {
     if(currentDrawing.id) return currentDrawing.name
     else return `Drawing #${drawings.length + 1}`
@@ -85,23 +99,22 @@ export default function Open() {
     }
 
     if(!currentDrawing.id) {
-      const drawing = await saveDrawing({
+      const newDrawing = await saveDrawing({
         owner: user,
         name, file
       })
 
-      if(!drawing) {
+      if(!newDrawing) {
         excalidrawApi?.setToastMessage('Save failed!')
         throw 'Save failed!'
       }
 
-      setCurrentDrawing({ id: drawing.id, name })
+      setCurrentDrawing({ id: newDrawing.id, name })
       excalidrawApi?.setToastMessage(`${name}.. saved`)
       refreshSubscription()
       // setBusy(false) <-- don't set false here.. let the isSaving effect hook handle it
 
     } else {
-      const drawing = drawings.find(drawing => drawing.id === currentDrawing.id)
       if(!drawing) throw `You call that a drawing? ${currentDrawing.id}`
       drawing.set('name', name)
       drawing.set('file', file)
@@ -116,9 +129,9 @@ export default function Open() {
     nameRef, 
     saveFile,
     saveDrawing, 
-    elements, 
-    drawings, 
-    currentDrawing, 
+    elements,
+    drawing,
+    currentDrawing,
     setCurrentDrawing,
     excalidrawApi,
     setBusy,
@@ -158,7 +171,12 @@ export default function Open() {
       <div className={'w-1/2 flex items-center justify-center gap-2'}>
         <div className={'relative flex flex-col items-start'}>
           <Input _ref={nameRef} type={'text'} defaultValue={defaultName} disabled={busy} placeholder={'Name your drawing =)'}  />
-          <div className={'absolute -bottom-8 dark:text-purple-100/20'}>{currentDrawing.id}</div>
+          {ipfsGatewayUrl && <a className={`
+            absolute -bottom-24 dark:text-purple-100/40 break-all`}
+            href={ipfsGatewayUrl}
+            target={'_blank'} rel={'noreferrer'}>
+            {ipfsGatewayUrl}
+          </a>}
         </div>
         <Button onClick={onSaveDrawing} disabled={busy}>{'Save'}</Button>
       </div>

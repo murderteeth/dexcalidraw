@@ -13,16 +13,13 @@ function TopRightUi() {
   const {  isAuthenticated, isWeb3Enabled } = useMoralis()
   const { setDialogRoute } = useDialogRoute()
   const { chain } = useDexcalidraw()
-
-  const isChainSupported = useMemo(() => {
-    return chain.id !== 0
-  }, [chain])
+  const isChainSupported = chain.id !== 0
 
   return <div className={'Island'}>
     <div className={`
       px-4 py-2 flex items-center gap-4 shadow-md rounded-lg`}>
       <div onClick={() => setDialogRoute('about')} className={'cursor-pointer'}>
-        {(!isWeb3Enabled || isChainSupported) && <Wordmark />}
+        {(!isWeb3Enabled || isChainSupported) && <Wordmark hover={true} />}
         {isWeb3Enabled && !isChainSupported && <div className={'px-4 py-2 text-xl text-red-400'}>
           {`Network not supported!`}
         </div>}

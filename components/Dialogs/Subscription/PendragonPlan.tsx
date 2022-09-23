@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import Hexagon from '../Mint/Hexagon'
 import QR from '../Mint/QR'
+import Pendragon from '../../Pendragon'
 dayjs.extend(relativeTime)
 
 export default function PendragonPlan({ className }: { className: string }) {
@@ -22,8 +23,7 @@ export default function PendragonPlan({ className }: { className: string }) {
       {'Store up to 1 GB of drawings for a year.'}
     </p>
     <div className={'relative flex items-center justify-center'}>
-      <Hexagon className={'w-48 h-48 stroke-purple-500'} />
-      <QR className={'absolute w-24 h-24 stroke-purple-500 fill-amber-400'} />
+      <Pendragon className={'w-64 h-64 stroke-purple-500 fill-red-400 dark:fill-red-600'} />
     </div>
     <div className={'flex flex-col items-center gap-2'}>
       <p>You are using</p>
