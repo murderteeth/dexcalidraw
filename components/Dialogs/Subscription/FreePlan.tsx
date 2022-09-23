@@ -22,7 +22,7 @@ export default function FreePlan({ className }: { className: string }) {
     </div>
     {subscription.filled && <>
       <p className={'text-lg '}>
-        {`Looks like you've used up all your free drawings. Did you know you can store up to 2 GB of drawings by upgrading to the Pendragon Plan?`}
+        {`Looks like you've used up all your free drawings. Did you know you can store up to 1 GB of drawings by upgrading to the Pendragon Plan?`}
       </p>
       <Button onClick={() => setDialogRoute('mint')}>{'Show me the Pendragon Plan'}</Button>
     </>}
